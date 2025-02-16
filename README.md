@@ -402,4 +402,4 @@ This project demonstrates an approach to reconstructing playlists based on vario
 
 ## Contributors
 This project was developed as part of a team of four.  
-While the work was collaborative, the final model and implementation, which achieved the best accuracy, were developed and executed by me.
+While the work was collaborative, the final model and implementation, which achieved the best accuracy (above 40%), were developed and executed by me.
