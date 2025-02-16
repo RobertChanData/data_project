@@ -18,7 +18,9 @@ The Jupyter Notebook is structured in 5 ways:
 4. Top-Year Playlist Reconstruction using Machine Learning
 5. Reconstruction the Mlaylist Data
 
-### Key Result  
+
+
+<h2 align="center">  :star: Key Result  :star: </h2>
 
 This **data imputation** problem was approached as a **classification problem**.  
 
@@ -32,8 +34,10 @@ This **data imputation** problem was approached as a **classification problem**.
 - Before feature engineering, model performance was at best **40%** using more complex model (k-NN, Random Forest Classifier, Gradient Boosting)
 - To prevent overfitting, **hyperparameter tuning** using grid was performed and 
 
-**Output**: The dataset with the reconstructed user and top_year predicted by both models.
-
+**Output**: The dataset with the reconstructed user and top_year predicted by both models.  
 
 <h1 align="center">Exploratory Data Analysis EDA</h1>
 
+The Exploratory Data Analysis is structured in 9 sub-sections:
+
+**1.** Data Exploration - **2.** Handling missing values - **3.** Check for duplicate - **4.** Explore the Target variable - **5.** Data Type - **6.** Descriptive Analysis - **7.** Correlation Analysis - **8.** Feature-Target Relationship Analysis (User) - **9.** Feature-Target Relationship Analysis (Top_year)
