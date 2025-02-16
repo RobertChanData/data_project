@@ -16,7 +16,7 @@ The Jupyter Notebook is structured in 5 ways:
 2. Data Preparation (preprocessing)
 3. User Playlist Reconstruction using Machine Learning
 4. Top-Year Playlist Reconstruction using Machine Learning
-5. Reconstruction the Mlaylist Data
+5. Reconstruction the Playlist Data
 
 
 
