@@ -286,3 +286,42 @@ The model performs similarly well on the test set with an accuracy of **87%**. K
 
 Overall, the model did generalize quite well and is effective at **recovering** the missing user
 
+<h1 align="center">Model for Top-Year</h1>
+
+Similar with user we decide to resolve the Top_Year prediction by treating it like a **multi-classification** problem.  
+There is 7 class to predict, and we would like to mix some **songs features** with **past album popularity** to get accurate prediction.  
+The idea is that a specific album was top of the year then  most likely the songs that belong to the album have more chance to be top of this year.
+
+### Feature Engineering
+for the feature addition, we implemented:  
+The number of times a song has appeared in a given year, based on its album's appearance in the top year.  
+The idea is that if an album was popular in a specific year, the tracks from it are likely to be liked as well.  
+This feature capture the **trends in how an album** (and its song) is popular over the year, data that was lost due to data deletion.  
+It is calcuated by counting the top year of the album for every year. An album may appear multiples times if 2 songs are listened from the same album or if two differents users listen to a track from this album. Since there is no duplicate, there is no issue counting twice.
+
+### k-NN (k-Nearest Neighbors)
+
+First model tested with the new feature addition was k-NN.  
+Since it is a distance-based algorith, the data should be scaled (ideally, Min-Max to keep the shape unchanged)  
+We use hyperparameter tuning with GridSearch and achieve a 66% accuracy on the test dataset which is correct but we would like to explore a better model
+
+### Test Data Classification Report:
+
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| 0     | 0.75      | 0.83   | 0.79     | 163     |
+| 1     | 0.71      | 0.72   | 0.72     | 150     |
+| 2     | 0.66      | 0.70   | 0.68     | 148     |
+| 3     | 0.65      | 0.66   | 0.66     | 153     |
+| 4     | 0.52      | 0.55   | 0.53     | 130     |
+| 5     | 0.57      | 0.49   | 0.53     | 152     |
+| 6     | 0.71      | 0.62   | 0.66     | 151     |
+| **Accuracy**     | **0.66**  |        |          | **1047** |
+| **Macro avg**    | **0.65**  | **0.65**| **0.65** | **1047** |
+| **Weighted avg** | **0.66**  | **0.66**| **0.66** | **1047** |
+
+### Decision Tree Classifier
+
+Decision Tree have the particularity to be build to overfit. So the goal here is to prune the tree before it overfit to the training data set.  
+We use again hyperparameter tuning with GridSearch.
+
