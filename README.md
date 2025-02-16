@@ -1,4 +1,4 @@
-# Spotify Project
+<h1 align="center">Spotify Project</h1>
 
 ### Project Overview
 This project is part of my Master's program: "Machine Learning I".
@@ -18,14 +18,22 @@ The Jupyter Notebook is structured in 5 ways:
 4. Top-Year Playlist Reconstruction using Machine Learning
 5. Reconstruction the Mlaylist Data
 
-### Key Result
+### Key Result  
 
-**User playlist** was reconstructed using **OneVSRestClassifier** (Logisitc Regression) with F1-score of **87%**.  
-- 5 class to predict
-- Before feature enigneering, model performance was at best 40% using more complex model (SVC, Random Forest, OvR with degree-3 poly kernel)
+This **data imputation** problem was approached as a **classification problem**.  
+
+**User playlist** was reconstructed using **OneVSRestClassifier** (Logistic Regression) with F1-score of **87%**.  
+- **5 class** to predict: {`alpha`, `beta`, `gamma`, `delta`, `epsilon`}
+- Before feature engineering, model performance was at best **40%** using more complex model (SVC, Random Forest, OvR with degree-3 poly kernel)
+- To prevent over-reliance on the newly feature created, **L2 penalty** (Ridge penalization) was added. It reduce overfitting and give more room for other features
 
 **Top-year playlist** was reconstructed using **Decision Tree Classifier** with F1-score of **76%**.
+- **7 class** to predict: {`2018`, `201`9, `2020`, `2021`, `2022`, `2023`, `2024`}
+- Before feature engineering, model performance was at best **40%** using more complex model (k-NN, Random Forest Classifier, Gradient Boosting)
+- To prevent overfitting, **hyperparameter tuning** using grid was performed and 
+
+**Output**: The dataset with the reconstructed user and top_year predicted by both models.
 
 
+<h1 align="center">Exploratory Data Analysis EDA</h1>
 
-### 1. Exploratory Data Analysis EDA
