@@ -34,7 +34,11 @@ This **data imputation** problem was approached as a **classification problem**.
 - Before feature engineering, model performance was at best **40%** using more complex model (k-NN, Random Forest Classifier, Gradient Boosting)
 - To prevent overfitting, **hyperparameter tuning** using grid was performed and 
 
-**Output**: The dataset with the reconstructed user and top_year predicted by both models.  
+**Output**: The dataset with the reconstructed user and top_year predicted by both models.
+
+___
+Comprehensive Analysis below
+___
 
 <h1 align="center">Exploratory Data Analysis EDA</h1>
 
@@ -114,3 +118,18 @@ Here is the boxplot for each column. *The complete analysis is in the notebook*
 
 *__Boxplot__ of the differents musical features*
 ![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_1.PNG?raw=true)
+
+## Correlation Analysis:
+
+*__Correlation Matrix__ of the differents musical features*
+![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_2.PNG?raw=true)
+
+We are checking for multicollinearity.
+- `loudness` and `energy` are highly correlated (0.828). There may be multicollinearity bias here
+- `acousticness` is strongly negatively correlated with `loudness` (-0.677) and `energy` (-0.786)
+- `danceability` and `valence` are positively correlated (0.584)
+
+`loudness`, `energy`, `danceability` and `valence` seems to all be correlated together to some extend.  
+We should keep that in mind during the next step.
+
+**Action**: Also, removing either `loudness` or `energy` should be done to avoid multicollinearity bias.
