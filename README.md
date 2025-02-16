@@ -170,6 +170,7 @@ Step implemented:
 - Convert `time_signature` and `mode` to categorical value
 - Convert time from millisecond to second
 - Perform scaling of data (Z-score normalization)
+- We separate unknow from known in the dataset. **We do not want the unknown value (which we will need to predict) to be part of any train or test dataset**
 
 About data standardization:
 - **Transform the data** to have a mean = 0 and std = 1 to ensure numeric feature have the same scal
@@ -305,8 +306,7 @@ First model tested with the new feature addition was k-NN.
 Since it is a distance-based algorith, the data should be scaled (ideally, Min-Max to keep the shape unchanged)  
 We use hyperparameter tuning with GridSearch and achieve a 66% accuracy on the test dataset which is correct but we would like to explore a better model
 
-### Test Data Classification Report:
-
+*Test Data Classification Report:*
 | Class | Precision | Recall | F1-Score | Support |
 |-------|-----------|--------|----------|---------|
 | 0     | 0.75      | 0.83   | 0.79     | 163     |
@@ -325,3 +325,81 @@ We use hyperparameter tuning with GridSearch and achieve a 66% accuracy on the t
 Decision Tree have the particularity to be build to overfit. So the goal here is to prune the tree before it overfit to the training data set.  
 We use again hyperparameter tuning with GridSearch.
 
+![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_4.PNG?raw=true)
+
+### Evaluation of the performance
+
+Training Data Classification Report:*
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| 0     | 0.86      | 0.83   | 0.85     | 337     |
+| 1     | 0.68      | 0.94   | 0.79     | 348     |
+| 2     | 0.80      | 0.73   | 0.77     | 347     |
+| 3     | 0.87      | 0.80   | 0.84     | 343     |
+| 4     | 0.73      | 0.81   | 0.77     | 370     |
+| 5     | 0.75      | 0.72   | 0.73     | 348     |
+| 6     | 0.99      | 0.72   | 0.83     | 349     |
+| **Accuracy**     | **0.79**  |        |          | **2442** |
+| **Macro avg**    | **0.81**  | **0.79**| **0.79** | **2442** |
+| **Weighted avg** | **0.81**  | **0.79**| **0.79** | **2442** |
+
+**Training Data Classification Report:**
+- **Overall Accuracy**: 79%
+- **Macro Average**: Precision: 0.81, Recall: 0.79, F1-Score: 0.79
+- **Weighted Average**: Precision: 0.81, Recall: 0.79, F1-Score: 0.79
+
+
+*Test Data Classification Report:*
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| 0     | 0.84      | 0.78   | 0.81     | 163     |
+| 1     | 0.64      | 0.91   | 0.75     | 150     |
+| 2     | 0.78      | 0.76   | 0.77     | 148     |
+| 3     | 0.87      | 0.79   | 0.83     | 153     |
+| 4     | 0.63      | 0.78   | 0.70     | 130     |
+| 5     | 0.71      | 0.62   | 0.66     | 152     |
+| 6     | 0.97      | 0.69   | 0.81     | 151     |
+| **Accuracy**     | **0.76**  |        |          | **1047** |
+| **Macro avg**    | **0.78**  | **0.76**| **0.76** | **1047** |
+| **Weighted avg** | **0.78**  | **0.76**| **0.76** | **1047** |
+
+**Test Data Classification Report:**
+- **Overall Accuracy**: 76%
+- **Macro Average**: Precision: 0.78, Recall: 0.76, F1-Score: 0.76
+- **Weighted Average**: Precision: 0.78, Recall: 0.76, F1-Score: 0.76
+
+**Key Insights:**
+- **Class 6** shows excellent precision (0.97) but a slightly lower recall (0.69).
+- **Class 1** has very high recall (0.91) but lower precision (0.64), suggesting a class imbalance.
+
+**Conclusion**: The model performs reasonably well, but recall and precision are not consistently high across all classes.  
+However the model performance is acceptable so we will use it to predict the `top_year` of a song.
+
+
+<h1 align="center">Reconstruction of the playlist</h1>
+
+"The goal of this project was to **impute the missing `user` and `top_year` values** using Machine Learning techniques.  
+
+While the exploratory data analysis (EDA) and modeling were important steps, the **real business value lies in the following code**, which apply the most efficient ML model founded to give prediction.
+
+### Make prediction
+
+Based on the model obtained, we can now confidently use the appropriate ML model to reconstruct the playlist: 
+- Predict unknown users using Logistic Regression (OvR)
+- Predict unknown top_year using Decision Tree
+
+### Reshape the initial CSV
+
+With some data cleaning and stucturing, we retrieve the initial dataset and attach the predicted value to its corresponding index
+
+### Output the result + Double check
+
+We create a short snippet of code that create a csv for every user and top_year and double-check the coherence of the result (correct number of csv file = 35 (7 different years x 5 different users) while checking that all top_year and user have been filed.
+
+<h1 align="center">Conclusion</h1>
+
+This project demonstrates an approach to reconstructing playlists based on various song characteristics and user preferences. While the model performs reasonably well, there is still potential for improvement by refining the features or tuning the model further.
+
+## Contributors
+This project was developed as part of a team of four.  
+While the work was collaborative, the final model and implementation, which achieved the best accuracy, were developed and executed by me.
