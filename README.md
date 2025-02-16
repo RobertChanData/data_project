@@ -119,7 +119,7 @@ Here is the boxplot for each column. *The complete analysis is in the notebook*
 *__Boxplot__ of the differents musical features*
 ![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_1.PNG?raw=true)
 
-## Correlation Analysis:
+### Correlation Analysis:
 
 *__Correlation Matrix__ of the differents musical features*
 ![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_2.PNG?raw=true)
@@ -133,3 +133,76 @@ We are checking for multicollinearity.
 We should keep that in mind during the next step.
 
 **Action**: Also, removing either `loudness` or `energy` should be done to avoid multicollinearity bias.
+
+
+### Feature-Target Relationship Analysis (User):
+
+In this section, we compare the distribution of differents features song regarding their using to identify differentiating pattern
+*(Full visualisation and explication are in the notebook)*
+
+![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_3.PNG?raw=true)
+
+Reminder: `unknown` is not a separate group but a missing value from one of the 5 users.
+
+- **`gamma`**: Most distinct taste in music. Prefers **energetic**, **danceable**, and **loud** tracks. Also, likes **low instrumentalness**, **high speechiness**, and popular songs. *(Pop/Electronic/House?)*
+- **`epsilon`**: Similar to `gamma`, but with **lower valence**, **lower speechiness**, **higher instrumentalness**, and prefers **less-known artists**. *(Experimental/Indie?)*
+- **`alpha`**: Notable for **lower acousticness**, **higher energy**, and **higher valence** compared to `beta` and `delta`.
+- **`beta`**: Notable for **outliers in song duration**, **wide spread in acousticness** and **energy**, and listens mainly to **mode = 0** songs. *(Tendency for melancholic sound?)*
+- **`delta`**: Has **low instrumentalness** compared to `alpha` and `beta`.
+
+Overall, **gamma** is the most distinct, followed by **epsilon**. **Alpha**, **beta**, and **delta** are similar, with **beta** standing out due to some unique characteristics.
+
+### Feature-Target Relationship Analysis (Year):
+
+Same for Year
+
+Since it combines user tastes, the top songs of the year become somewhat irrelevant. There are noticeable differences, but nothing truly distinguishable based on song features.
+It might be better to split the analysis by user and top year, or explore metadata like artist or group instead.
+
+
+<h1 align="center">Data Preparation</h1>
+
+This step deal mainly with data preprocessing. Below are the step implemented in the notebook.
+
+Step implemented:
+- remove duplicate (2 rows)
+- Drop missing values (9 rows)
+- Convert `time_signature` and `mode` to categorical value
+- Convert time from millisecond to second
+- Perform scaling of data (Z-score normalization)
+
+About data standardization:
+- **Transform the data** to have a mean = 0 and std = 1 to ensure numeric feature have the same scal
+- **Improve model convergence** (Gradient descent for Logistic Regression)
+- **Equal weight for feature**: avoid bias introduced by different scale (here millisecond) compare to song feature (ranging from 0 to 1)
+- **Distanced-base algorithm**: avoid biasing kNN algorithm
+
+<h1 align="center">Model for User</h1>
+
+We decide to resolve the User prediction by treating it like a **multi-classification** problem.  
+There is 5 class to predict, and we would like to mix some **songs features** with **past listening behaviour** to get accurate prediction.  
+The idea is that a specific user is most likely to listen to songs that belong to an artist it has listened to the past.
+
+### Feature Engineering
+for the feature addition, we implemented:  
+Number of time a user has listened to an artist in the past  
+This feature capture the **user’s past behavior toward certain artists** (and songs), which was lost due to data deletion.  
+In the code, it is calculated by counting the number of time the song was listened by all the user
+
+## 🚨 Important Note 🚨
+This is **not** a standard supervised learning problem where we predict an unknown future user.
+
+Instead, we're **recovering missing user data** that originally existed but was later deleted.  
+The goal is to **restore** this information using past listening patterns that were present before deletion.
+
+Because of this, using **target-related features** (like how many times a user has listened to an artist) is **<span style="color:red;">not data leakage in this specific case</span>** it's leveraging information that was already there.
+
+In a **classic prediction setup**, we **<span style="color:red;">would never</span>** use these metrics to predict future users.  
+But here, they help **reconstruct lost data**, making them **valid for our task**.
+
+By implementing this new feature, we improve the most basic model from **40%** to over **85%**
+
+### Logistic Regression and why this choice
+
+
+
