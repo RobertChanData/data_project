@@ -55,7 +55,7 @@ Target to predict are the missing value in:
 - user: {`alpha`, `beta`, `gamma`, `delta`, `epsilon`}
 - top_year: {`2018`, `201`9, `2020`, `2021`, `2022`, `2023`, `2024`}
 
-*Sample of the table*
+*__Table__: Sample of the dataset*
 | name | album | artist | release_date | length | popularity | acousticness | danceability | energy | instrumentalness | liveness | loudness | speechiness | tempo | valence | time_signature | key | mode | uri | release_year | top_year | user |
 |------|-------|--------|--------------|--------|------------|--------------|--------------|--------|------------------|---------|----------|-------------|-------|---------|----------------|-----|------|-----|--------------|----------|------|
 | Variations on a Polish Theme, Op. 10: No. 5 Andantino | Szymanowski: Piano Works, Vol. 2 | Karol Szymanowski | 06/12/1996 | 76933 | 53 | 0.9960 | 0.329 | 0.00695 | 0.866000 | 0.0906 | -34.227 | 0.0448 | 70.295 | 0.238 | 4 | 11 | 0 | spotify:track:3bcdLMrAxrfn5dxInjIdI2 | 1996 | unknown | unknown |
@@ -65,13 +65,13 @@ Target to predict are the missing value in:
 
 ### General data
 
-- The dataset contains 3600 rows.  
-- 2 duplicate entries were identified and removed. 
+- The dataset contains **3600** rows.  
+- **2 duplicate entries** were identified and removed. 
 - 9 songs with no name, album and artist = `Various artist`. After verification, it is not an input error.  
   Given their low occurrence, they were removed to maintain data quality without significantly impacting model performance.
-- Predicted class are perfectly balanced (no bias from class imbalanced)
+- Predicted class are **perfectly balanced** (no bias from class imbalanced)
 
-*Contingency table between user and top_year*
+*__Contingency table__: between user and top_year*
 | top_year | alpha | beta | delta | epsilon | gamma | unknown |
 |----------|-------|------|-------|---------|-------|---------|
 | 2018     | 100   | 100  | 100   | 100     | 100   | 0       |
@@ -83,3 +83,34 @@ Target to predict are the missing value in:
 | 2024     | 100   | 100  | 100   | 100     | 100   | 0       |
 | unknown  | 0     | 0    | 0     | 0       | 0     | 100     |
 
+### Descriptive Analysis
+
+Each track has distinct musical features that differentiate it from others.  
+*Source: https://developer.spotify.com/documentation/web-api/reference/get-audio-features*
+
+How about an real example to illustrate it?
+
+🎵 Don't Stop Me Now (Remastered 2011) - Queen 🎵  
+[Listen on Spotify](https://open.spotify.com/track/5T8EDUDqKcs6OSOwEsfqG7)  
+
+| **Song**                    | **Album**            | **Artist** | **Release Date** | **Length**     | **Popularity** | **Acousticness** | **Danceability** | **Energy** | **Instrumentalness** | **Liveness** | **Loudness** | **Speechiness** | **Tempo** | **Valence** | **Key**  | **Top Year** | **User** |                                            |
+|-----------------------------|----------------------|------------|------------------|----------------|----------------|------------------|------------------|------------|----------------------|--------------|--------------|-----------------|-----------|-------------|----------|--------------|----------|--------------------------------------------------|
+| Don't Stop Me Now - Remastered 2011 | Jazz (2011 Remaster) | Queen      | 1978-11-10       | 3m 29s         | 85%            | 4.75%            | 55.9%            | 86.8%      | 0.02%                | 77.6%        | -5.28 dB     | 17%             | 156 BPM   | 60.9%       | F Major | 2020         | Alpha
+
+| **Feature**         | **Value**     | **Description**                                  |
+|---------------------|---------------|--------------------------------------------------|
+| **Acousticness**     | 4.75%         | Mostly electric, with little acoustic presence   |
+| **Danceability**     | 56%           | Energetic, catchy rhythm, dance-friendly         |
+| **Energy**           | 86.8%         | High energy, powerful, perfect for a lively vibe |
+| **Instrumentalness** | 0.02%         | Vocal-driven with minimal instrumental sections  |
+| **Liveness**         | 77.6%         | Studio recording with live performance energy    |
+| **Loudness**         | -5.28 dB      | Loud and dynamic, fitting for rock anthems       |
+| **Speechiness**      | 17%           | Some spoken moments, mainly singing             |
+| **Tempo**            | 156 BPM       | Fast-paced, adding to the upbeat vibe            |
+| **Valence**          | 60.9%         | Positive, fun, and uplifting                    |
+| **Key**              | F Major       | Bright and open, matching the energetic tone    |
+
+Here is the boxplot for each column. *The complete analysis is in the notebook*
+
+*__Boxplot__ of the differents musical features*
+![Alt text](https://github.com/RobertChanData/spotify_project/blob/main/Screenshot/Spotify_1.PNG?raw=true)
