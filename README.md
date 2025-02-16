@@ -183,26 +183,106 @@ We decide to resolve the User prediction by treating it like a **multi-classific
 There is 5 class to predict, and we would like to mix some **songs features** with **past listening behaviour** to get accurate prediction.  
 The idea is that a specific user is most likely to listen to songs that belong to an artist it has listened to the past.
 
+### General rule
+
+- Data is standardized (Z-score) to avoid bias introduced by difference in scale
+- Categorical label are handled with One-Hot Encoding
+- The class are already balanced (no need for SMOTE, random under-sampling or use Ensemble method)
+- Train / Test split (70% - 30%). No validation set for this one (an error but I was still learning)
+- Simple model are prefer for better explainability (personal preference)
+- Metric is F1-score. In our case, accuracy can also be use (as class are perfectly balance, it is the same)
+  All error have the same cost so no emphasise on precision or recall
+- Data leakage is carefully check and verified (target leakage, data split leakage, temporal leakage)   
+
 ### Feature Engineering
 for the feature addition, we implemented:  
 Number of time a user has listened to an artist in the past  
 This feature capture the **user’s past behavior toward certain artists** (and songs), which was lost due to data deletion.  
 In the code, it is calculated by counting the number of time the song was listened by all the user
 
-## 🚨 Important Note 🚨
+#### 🚨 Important Note 🚨
 This is **not** a standard supervised learning problem where we predict an unknown future user.
 
 Instead, we're **recovering missing user data** that originally existed but was later deleted.  
 The goal is to **restore** this information using past listening patterns that were present before deletion.
 
-Because of this, using **target-related features** (like how many times a user has listened to an artist) is **<span style="color:red;">not data leakage in this specific case</span>** it's leveraging information that was already there.
+Because of this, using **target-related features** (like how many times a user has listened to an artist) may **<span style="color:red;">not be data leakage in this specific case</span>** it's leveraging information that was already there.
 
 In a **classic prediction setup**, we **<span style="color:red;">would never</span>** use these metrics to predict future users.  
 But here, they help **reconstruct lost data**, making them **valid for our task**.
 
 By implementing this new feature, we improve the most basic model from **40%** to over **85%**
 
-### Logistic Regression and why this choice
+### OneVsRestClassfier (Logistic Regression) and why this choice
 
+Initially, we try various model from One Vs REst Classifier (OvR), Support Vector Classifier (SVC), Random Forest Classifier (RFC) or OvR with 3 degree polynomial but performance keep plateauing at **40%**.
 
+Since hyperparameter tuning is unlikely to significantly improve an underfitting model, the primary issue lies in the model's inability to capture certain patterns. Initially, focusing only on song characteristics for predictions was not ideal because users may listen to a wide range of music, which dilutes the data for individual songs. 
+
+Additionally, it makes sense that users have favorite artists and tend to listen to music from those artists frequently. To address this, we incorporated this information into the model by creating a new feature.
+
+Then OneVsRestClassfier (polynomial = 1) achieve over 85% accuracy. Main advantages:
+- Simple and effective model at multi-class classification
+- Model interpretation is easier than other model
+- Work well with linear decision boundaries that we know have some thanks to initial EDA
+
+**Issue:** The model become too reliant on the new feature, potentially overshadowing other important features.
+
+**Solution:** To counteract this, we apply L2 Regularization (Ridge Regression). This technique penalizes large coefficients, discouraging the model from relying too heavily on any one feature. As a result, other features can maintain their importance and contribute more equally to the model.
+
+To verify the effectivness of L2 Regularization, we extracted the coefficient on the table below:
+
+*_Table of Coefficient_: One Vs Rest Classifier*
+
+| intercept | length | popularity | acousticness | danceability | instrumentalness | liveness | loudness | speechiness | tempo | valence | time_signature | key | mode | release_year | alpha | beta | delta | epsilon | gamma |
+|-----------|--------|------------|--------------|--------------|------------------|----------|----------|-------------|-------|--------|----------------|-----|------|--------------|-------|------|-------|---------|-------|
+| -2.326080 | 0.0    | 0.017825   | 0.178422     | -0.057884    | -0.139130        | 0.276361 | 0.031776 | 0.019353    | -0.061624 | -0.073768 | 0.460503      | -0.059257 | -0.209634 | -0.054195 | 0.009297 | 3.593210 | -0.952516 | -1.373505 | -1.338615 | -2.272582 |
+| -3.328219 | 0.0    | 0.144096   | -0.123597    | 0.310103     | -0.202903        | -0.686798 | -0.132983 | -0.532335   | -0.518969 | 0.033733  | 0.183406      | 0.124217  | 0.134725  | 0.426631   | 0.081367 | -0.664133 | 2.001571 | -3.966839 | -0.683531 | -0.826687 |
+| -2.013668 | 0.0    | -0.153045  | -0.051944    | 0.415223     | -0.049618        | -0.421776 | 0.034577 | -0.171955   | -0.260469 | 0.045557  | -0.098376     | 0.012364  | -0.014058 | -0.135649 | -0.326588 | -1.745097 | -1.395176 | 5.213645  | -0.890202 | -1.494953 |
+| -4.154240 | 0.0    | -0.163426  | -0.238793    | -0.411020    | -0.176140        | 0.387888 | 0.090226 | 0.425217    | 0.182506  | 0.006468  | -0.167992     | 0.102740  | 0.126372  | -0.153452 | 0.398615 | -4.089585 | -3.550788 | -3.313403 | 7.836781 | -2.507520 |
+| -2.070468 | 0.0    | 0.226194   | 0.216133     | -0.073415    | 0.556250         | -0.056953 | -0.112513 | 0.485042    | 0.111461  | 0.078832  | -0.195338     | -0.107733 | -0.086649 | 0.106091  | 0.029783 | -1.585514 | -1.715078 | -0.038873 | -0.492014 | 4.935589  |
+
+### Evaluation of the performance
+
+Lastly, we need to evaluate the performance of the model on both train and test dataset
+
+*Training Data Classification Report*
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| 0     | 0.85      | 0.79   | 0.82     | 476     |
+| 1     | 0.85      | 0.86   | 0.85     | 483     |
+| 2     | 0.87      | 0.86   | 0.86     | 478     |
+| 3     | 0.89      | 0.93   | 0.91     | 507     |
+| 4     | 0.91      | 0.92   | 0.91     | 498     |
+| **Accuracy** |  |  | **0.87** | 2442 |
+| **Macro avg** | 0.87 | 0.87 | 0.87 | 2442 |
+| **Weighted avg** | 0.87 | 0.87 | 0.87 | 2442 |
+
+The model performs well with an overall accuracy of **87%**. Here are the key metrics:
+
+- **Precision**: 0.85-0.91 across classes.
+- **Recall**: 0.79_0.93, with class 3 having the highest recall (0.93).
+- **F1-Score**: 0.82-0.91, showing a good balance.
+- **Macro & Weighted Averages**: Both around 0.87, indicating consistent performance.
+
+*Test Data Classification Report*
+| Class | Precision | Recall | F1-Score | Support |
+|-------|-----------|--------|----------|---------|
+| 0     | 0.85      | 0.78   | 0.82     | 224     |
+| 1     | 0.89      | 0.86   | 0.87     | 217     |
+| 2     | 0.87      | 0.86   | 0.86     | 218     |
+| 3     | 0.83      | 0.95   | 0.89     | 188     |
+| 4     | 0.90      | 0.89   | 0.89     | 200     |
+| **Accuracy** |  |  | **0.87** | 1047 |
+| **Macro avg** | 0.87 | 0.87 | 0.87 | 1047 |
+| **Weighted avg** | 0.87 | 0.87 | 0.87 | 1047 |
+
+The model performs similarly well on the test set with an accuracy of **87%**. Key metrics are as follows:
+
+- **Precision**: 0.83-0.90 across classes.
+- **Recall**: 0.78-0.95, with class 3 having the highest recall (0.95).
+- **F1-Score**: 0.82-0.89, indicating good balance.
+- **Macro & Weighted Averages**: Both around 0.87, showing consistent performance across all classes.
+
+Overall, the model did generalize quite well and is effective at **recovering** the missing user
 
